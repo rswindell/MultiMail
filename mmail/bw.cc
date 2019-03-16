@@ -3,7 +3,7 @@
  * Blue Wave class
 
  Copyright 1996-1997 Toth Istvan <stoty@vma.bme.hu>
- Copyright 1998-2018 William McBrine <wmcbrine@gmail.com>
+ Copyright 1998-2019 William McBrine <wmcbrine@gmail.com>
  Distributed under the GNU General Public License, version 3 or later. */
 
 #include "bw.h"
@@ -290,7 +290,7 @@ void bluewave::findInfBaseName()
     size_t len = strlen(q) - 4;
     if (len > 8)
         len = 8;
-    strncpy(packetBaseName, q, len);
+    memcpy(packetBaseName, q, len);
     packetBaseName[len] = '\0';
 }
 
@@ -838,10 +838,21 @@ void bwreply::addHeader(FILE *uplFile)
     strncpy((char *) newUplHeader.vernum, MM_VERNUM, 20);
     for (int c = 0; newUplHeader.vernum[c]; newUplHeader.vernum[c++] -= 10);
 
-    int tearlen = sprintf((char *) newUplHeader.reader_name, MM_NAME
-                          "/%s", sysname());
-    strncpy((char *) newUplHeader.reader_tear, ((tearlen < 17) ?
-            (char *) newUplHeader.reader_name : MM_NAME), 16);
+    const char *name = sysname();
+    size_t len = strlen(name);
+
+    if (len < 80 - sizeof(MM_NAME))
+        sprintf((char *) newUplHeader.reader_name, MM_NAME "/%s", name);
+    else
+        strcpy((char *) newUplHeader.reader_name, MM_NAME);
+
+    if (len < 16 - sizeof(MM_NAME))
+        strcpy((char *) newUplHeader.reader_tear,
+               (char *) newUplHeader.reader_name);
+    else if (len < 16 - sizeof(MM_SNAME))
+        sprintf((char *) newUplHeader.reader_tear, MM_SNAME "/%s", name);
+    else
+        strcpy((char *) newUplHeader.reader_tear, MM_NAME);
 
     strcpy((char *) newUplHeader.loginname, baseClass->getLoginName());
     strcpy((char *) newUplHeader.aliasname, baseClass->getAliasName());

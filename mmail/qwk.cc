@@ -3,7 +3,7 @@
  * QWK
 
  Copyright 1997 John Zero <john@graphisoft.hu>
- Copyright 1997-2018 William McBrine <wmcbrine@gmail.com>
+ Copyright 1997-2019 William McBrine <wmcbrine@gmail.com>
  Distributed under the GNU General Public License, version 3 or later. */
 
 #include "qwk.h"
@@ -132,22 +132,22 @@ void qheader::output(FILE *repFile)
     memset(&qh, ' ', sizeof qh);
 
     sprintf(buf, " %-6ld", msgnum);
-    strncpy(qh.msgnum, buf, 7);
+    memcpy(qh.msgnum, buf, 7);
 
     putshort(&qh.confLSB, msgnum);
 
     if (refnum) {
         sprintf(buf, " %-7ld", refnum);
-        strncpy(qh.refnum, buf, 8);
+        memcpy(qh.refnum, buf, 8);
     }
-    strncpy(qh.to, to, tolen);
-    strncpy(qh.from, from, fromlen);
-    strncpy(qh.subject, subject, sublen);
+    memcpy(qh.to, to, tolen);
+    memcpy(qh.from, from, fromlen);
+    memcpy(qh.subject, subject, sublen);
 
     qh.alive = (char) 0xE1;
 
-    strncpy(qh.date, date, 8);
-    strncpy(qh.time, &date[9], 5);
+    memcpy(qh.date, date, 8);
+    memcpy(qh.time, &date[9], 5);
 
     if (privat)
         qh.status = '*';
@@ -262,7 +262,7 @@ bool qwkpack::externalIndex()
         while (p) {
             int x, cMsgNum = 0;
 
-            strncpy(fname, p, strlen(p) - 4);
+            memcpy(fname, p, strlen(p) - 4);
             fname[strlen(p) - 4] = '\0';
             x = atoi(fname);
 
@@ -742,7 +742,7 @@ bool qwkreply::getRep1(FILE *rep, upl_qwk *l)
                 anyfound = false;
 
                 q = (char *) onecomp((unsigned char *) p,
-                                    l->qHead.subject, "subject:");
+                                     l->qHead.subject, "subject:");
                 if (q) {
                     p = q;
                     anyfound = true;
@@ -750,14 +750,14 @@ bool qwkreply::getRep1(FILE *rep, upl_qwk *l)
 
                 if (qwke) {
                     q = (char *) onecomp((unsigned char *) p,
-                                        l->qHead.to, "to:");
+                                         l->qHead.to, "to:");
                     if (q) {
                         p = q;
                         anyfound = true;
                     }
 
                     q = (char *) onecomp((unsigned char *) p,
-                                        l->qHead.from, "from:");
+                                         l->qHead.from, "from:");
                     if (q) {
                         p = q;
                         anyfound = true;
@@ -837,9 +837,12 @@ void qwkreply::enterLetter(letter_header &newLetter,
 
     upl_qwk *newList = new upl_qwk(newLetterFileName);
 
-    strncpy(newList->qHead.subject, newLetter.getSubject(), sizeof(newList->qHead.subject) - 1);
-    strncpy(newList->qHead.from, newLetter.getFrom(), sizeof(newList->qHead.from) - 1);
-    strncpy(newList->qHead.to, newLetter.getTo(), sizeof(newList->qHead.to) - 1);
+    strncpy(newList->qHead.subject, newLetter.getSubject(),
+            sizeof(newList->qHead.subject) - 1);
+    strncpy(newList->qHead.from, newLetter.getFrom(),
+            sizeof(newList->qHead.from) - 1);
+    strncpy(newList->qHead.to, newLetter.getTo(),
+            sizeof(newList->qHead.to) - 1);
 
     newList->qHead.msgnum = atol(mm->areaList->getShortName());
     newList->qHead.privat = newLetter.getPrivate();

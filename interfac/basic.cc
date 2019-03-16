@@ -4,7 +4,7 @@
 
  Copyright 1996 Kolossvary Tamas <thomas@tvnet.hu>
  Copyright 1997 John Zero <john@graphisoft.hu>
- Copyright 1997-2018 William McBrine <wmcbrine@gmail.com>
+ Copyright 1997-2019 William McBrine <wmcbrine@gmail.com>
  Distributed under the GNU General Public License, version 3 or later. */
 
 #include "interfac.h"
@@ -408,17 +408,15 @@ int ShadowedWin::getstring(int y, int x, char *string, int maxlen,
             if ((i < maxlen) && tmp[i])
                 i++;
             break;
+        case MM_BACKSP:
+            if (!i)
+                break;
+            i--;
         case 127:
         case MM_DEL:    // Delete key
-            strncpy(&tmp[i], &tmp[i + 1], maxlen - i);
+            for (j = i; j < maxlen; j++)
+                tmp[j] = tmp[j + 1];
             tmp[maxlen] = '\0';
-            break;
-        case MM_BACKSP:
-            if (i > 0) {
-                strncpy(&tmp[i - 1], &tmp[i], maxlen + 1 - i);
-                tmp[maxlen] = '\0';
-                i--;
-            }
             break;
         case MM_HOME:
             i = 0;

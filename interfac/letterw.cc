@@ -4,7 +4,7 @@
 
  Copyright 1996 Kolossvary Tamas <thomas@tvnet.hu>
  Copyright 1997 John Zero <john@graphisoft.hu>
- Copyright 1997-2018 William McBrine <wmcbrine@gmail.com>
+ Copyright 1997-2019 William McBrine <wmcbrine@gmail.com>
  Distributed under the GNU General Public License, version 3 or later. */
 
 #include "interfac.h"
@@ -448,7 +448,7 @@ void LetterWindow::DrawFlags()
 
 void LetterWindow::lineCount()
 {
-    char tmp[30];
+    char tmp[40];
     int percent = ((position + y) > NumOfLines) ? 100 :
                   (((long) position + y) * 100 / NumOfLines);
 
@@ -626,7 +626,7 @@ void LetterWindow::DrawStat()
     areaconv_in(tmp);
 
     if (s && ((int) strlen(s) > maxw))
-        strncpy(tmp + maxw + pnlen + 1, "...", 3);
+        memcpy(tmp + maxw + pnlen + 1, "...", 3);
 
     if (collflag)
         ui->areas.Select();
